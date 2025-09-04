@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Emotion Detection AI</title>
+<meta name="description" content="Advanced computer vision technology for real-time emotion detection" />
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+<!-- Custom CSS -->
+<style>
+    /* Design System */
+    html {
+    scroll-behavior: smooth;
+}
+    :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 250 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 25% 95%;
+    --secondary-foreground: 220 15% 20%;
+    --muted: 220 25% 95%;
+    --muted-foreground: 220 15% 45%;
+    --accent: 280 100% 70%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 25% 90%;
+    --input: 220 25% 95%;
+    --ring: 250 100% 60%;
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(250 100% 60%), hsl(280 100% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(220 25% 95%), hsl(240 25% 98%));
+    --gradient-accent: linear-gradient(135deg, hsl(280 100% 70%), hsl(320 100% 75%));
+    
+    /* Emotion Colors */
+    --emotion-happy: 45 100% 60%;
+    --emotion-sad: 220 60% 50%;
+    --emotion-angry: 0 85% 60%;
+    --emotion-surprised: 35 100% 55%;
+    --emotion-neutral: 200 10% 50%;
+    --emotion-fear: 270 50% 45%;
+    --emotion-disgust: 120 40% 45%;
+    
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.15);
+    --shadow-card: 0 4px 20px hsl(220 25% 10% / 0.08);
+    }
+
+    .bg-gradient-primary { background: var(--gradient-primary); }
+    .bg-gradient-secondary { background: var(--gradient-secondary); }
+    .bg-gradient-accent { background: var(--gradient-accent); }
+    
+    .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    }
+    
+    .text-gradient-accent {
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    }
+
+    .shadow-glow { box-shadow: var(--shadow-glow); }
+    .shadow-card { box-shadow: var(--shadow-card); }
+
+    .bg-emotion-happy { background-color: hsl(var(--emotion-happy)); }
+    .bg-emotion-sad { background-color: hsl(var(--emotion-sad)); }
+    .bg-emotion-angry { background-color: hsl(var(--emotion-angry)); }
+    .bg-emotion-surprised { background-color: hsl(var(--emotion-surprised)); }
+    .bg-emotion-neutral { background-color: hsl(var(--emotion-neutral)); }
+    .bg-emotion-fear { background-color: hsl(var(--emotion-fear)); }
+    .bg-emotion-disgust { background-color: hsl(var(--emotion-disgust)); }
+
+    /* Animations */
+    @keyframes pulse-custom {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+    }
+    
+    .animate-pulse-custom {
+    animation: pulse-custom 2s infinite;
+    }
+
+    .transition-smooth {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Hide file input */
+    .hidden { display: none; }
+</style>
+
+<script>
+    tailwind.config = {
+    theme: {
+        extend: {
+        colors: {
+            'background': 'hsl(var(--background))',
+            'foreground': 'hsl(var(--foreground))',
+            'primary': 'hsl(var(--primary))',
+            'primary-foreground': 'hsl(var(--primary-foreground))',
+            'secondary': 'hsl(var(--secondary))',
+            'secondary-foreground': 'hsl(var(--secondary-foreground))',
+            'muted': 'hsl(var(--muted))',
+            'muted-foreground': 'hsl(var(--muted-foreground))',
+            'accent': 'hsl(var(--accent))',
+            'accent-foreground': 'hsl(var(--accent-foreground))',
+            'border': 'hsl(var(--border))',
+            'input': 'hsl(var(--input))',
+            'card': 'hsl(var(--card))',
+            'card-foreground': 'hsl(var(--card-foreground))',
+        }
+        }
+    }
+    }
+</script>
+</head>
+
+<body class="bg-background text-foreground min-h-screen">
+<!-- Hero Section -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 z-0">
+    <!-- <img
+        src="src/assets/emotion-hero.jpg"
+        alt="Emotion Detection Technology"
+        class="w-full h-full object-cover"
+    /> -->
+    <div class="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/95"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="relative z-10 max-w-6xl mx-auto px-6 text-center">
+    <div class="space-y-8">
+        <!-- Badge -->
+        <div class="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2">
+        <i data-lucide="brain" class="h-4 w-4 text-primary"></i>
+        <span class="text-sm font-medium text-primary">
+            Powered by Computer Vision
+        </span>
+        </div>
+
+        <!-- Main Heading -->
+        <div class="space-y-4">
+        <h1 class="text-5xl md:text-7xl font-bold leading-tight">
+            <span class="text-gradient-primary">Emotion</span><br />
+            <span class="text-foreground">Detection</span><br />
+            <span class="text-gradient-accent">AI</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Advanced computer vision technology that accurately detects and analyzes 
+            human emotions in real-time from images.
+        </p>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a 
+            href="#demo"
+            class="bg-gradient-primary hover:shadow-glow transition-smooth text-primary-foreground text-lg px-8 py-6 rounded-xl font-medium inline-flex items-center justify-center"
+        >
+            <i data-lucide="sparkles" class="mr-2 h-5 w-5"></i>
+            Try Demo Now
+        </a>
+        
+        <button 
+        onclick="openModal()"
+        class="border border-primary hover:bg-primary/10 transition-smooth text-lg px-8 py-6 rounded-xl font-medium inline-flex items-center justify-center"
+        >
+        <i data-lucide="zap" class="mr-2 h-5 w-5"></i>
+        Learn More
+        </button>
+
+<!-- Learn More Popup -->
+<div id="learnMoreModal" 
+     class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm hidden z-50">
+  
+  <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative transform scale-95 opacity-0 transition-all duration-300"
+       id="learnMoreContent">
+    
+    <!-- Close -->
+    <button onclick="closeModal()" 
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition">
+      ✖
+    </button>
+
+    <!-- Title -->
+    <h3 class="text-2xl font-bold mb-4 text-gray-800">✨ About Emotion Detection AI</h3>
+    
+    <!-- Content -->
+    <p class="text-gray-600 leading-relaxed mb-4">
+      Our AI system uses <span class="font-semibold">computer vision</span> and 
+      <span class="font-semibold">deep learning</span> to analyze facial expressions in real time.  
+      It can detect <span class="text-primary font-medium">seven core emotions</span> with high accuracy, 
+      helping create more <span class="italic">personalized and human-centered experiences</span>.
+    </p>
+
+    <!-- CTA inside popup -->
+    <div class="mt-6 flex justify-end">
+      <button onclick="closeModal()" 
+              class="px-6 py-3 rounded-xl bg-primary text-white font-medium hover:shadow-md transition">
+        Got it!
+      </button>
+    </div>
+  </div>
+</div>
+
+
+        </div>
+
+
+        <!-- Features Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+  <div class="space-y-2">
+    <div class="text-3xl font-bold ">🌍</div>
+    <div class="text-sm text-muted-foreground">Real-Time Global Access</div>
+    <p class="text-muted-foreground text-sm">
+      Works seamlessly across devices with instant cloud-based analysis.
+    </p>
+  </div>
+  
+  <div class="space-y-2">
+    <div class="text-3xl font-bold ">🔒</div>
+    <div class="text-sm text-muted-foreground">Privacy First</div>
+    <p class="text-muted-foreground text-sm">
+      Images are processed securely with no personal data stored.
+    </p>
+  </div>
+  
+  <div class="space-y-2">
+    <div class="text-3xl font-bold ">⚡</div>
+    <div class="text-sm text-muted-foreground">AI-Powered Insights</div>
+    <p class="text-muted-foreground text-sm">
+      Get detailed emotion breakdowns powered by deep learning models.
+    </p>
+  </div>
+</div>
+
+    </div>
+    </div>
+
+    <!-- Floating Elements -->
+    <div class="absolute top-20 left-10 w-20 h-20 bg-gradient-primary rounded-full opacity-20 animate-pulse"></div>
+    <div class="absolute bottom-20 right-10 w-16 h-16 bg-gradient-accent rounded-full opacity-20 animate-pulse" style="animation-delay: 1s"></div>
+    <div class="absolute top-1/2 right-20 w-12 h-12 bg-gradient-primary rounded-full opacity-20 animate-pulse" style="animation-delay: 2s"></div>
+</section>
+
+<!-- Demo Section -->
+<section id="demo" class="py-20">
+    <div class="max-w-6xl mx-auto p-6 space-y-8">
+    <!-- Upload Section -->
+    <div class="bg-gradient-secondary border-0 shadow-card rounded-xl p-6">
+        <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gradient-primary mb-2">
+            Emotion Detection Demo
+        </h2>
+        <p class="text-muted-foreground">
+            Upload an image or use your camera to detect emotions using advanced computer vision
+        </p>
+        </div>
+        
+        <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+            id="uploadBtn"
+            class="bg-gradient-primary hover:shadow-glow transition-smooth text-primary-foreground px-6 py-3 rounded-lg font-medium inline-flex items-center justify-center"
+            >
+            <i data-lucide="upload" class="mr-2 h-5 w-5"></i>
+            Upload Image
+            </button>
+            <button
+            id="cameraBtn"
+            class="border border-primary hover:bg-primary/10 transition-smooth px-6 py-3 rounded-lg font-medium inline-flex items-center justify-center"
+            >
+            <i data-lucide="camera" class="mr-2 h-5 w-5"></i>
+            <span id="cameraBtnText">Use Camera</span>
+            </button>
+        </div>
+
+        <input id="fileInput" type="file" accept="image/*" class="hidden" />
+
+        <!-- Camera View -->
+        <div id="cameraView" class="hidden flex-col items-center space-y-4">
+            <video id="video" autoplay playsinline class="max-w-md w-full rounded-lg border-2 border-primary/20"></video>
+            <button id="captureBtn" class="bg-gradient-primary text-primary-foreground px-6 py-3 rounded-lg font-medium inline-flex items-center">
+            <i data-lucide="sparkles" class="mr-2 h-5 w-5"></i>
+            Capture & Analyze
+            </button>
+        </div>
+
+        <!-- Image Preview -->
+        <div id="imagePreview" class="hidden justify-center">
+            <div class="relative">
+            <img id="selectedImage" class="max-w-md w-full rounded-lg border-2 border-primary/20" />
+            <div id="analyzing" class="hidden absolute inset-0 bg-primary/20 rounded-lg flex items-center justify-center">
+                <div class="flex items-center space-x-2 text-primary">
+                <i data-lucide="brain" class="h-6 w-6 animate-pulse-custom"></i>
+                <span class="font-medium">Analyzing emotions...</span>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results" class="hidden bg-card border-0 shadow-card rounded-xl p-6">
+        <div class="text-center mb-6">
+        <h3 class="text-xl font-bold">Detected Emotions</h3>
+        </div>
+        <div id="emotionResults" class="space-y-4"></div>
+    </div>
+    </div>
+</section>
+
+<script>
+function openModal() {
+  const modal = document.getElementById('learnMoreModal');
+  const content = document.getElementById('learnMoreContent');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    content.classList.remove('scale-95', 'opacity-0');
+    content.classList.add('scale-100', 'opacity-100');
+  }, 10);
+}
+function closeModal() {
+  const modal = document.getElementById('learnMoreModal');
+  const content = document.getElementById('learnMoreContent');
+  content.classList.add('scale-95', 'opacity-0');
+  content.classList.remove('scale-100', 'opacity-100');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 300);
+}
+
+
+
+// Initialize Lucide icons
+lucide.createIcons();
+
+// Global variables
+let stream = null;
+let isAnalyzing = false;
+let analysisInterval = null;
+
+// DOM elements
+const uploadBtn = document.getElementById('uploadBtn');
+const cameraBtn = document.getElementById('cameraBtn');
+const cameraBtnText = document.getElementById('cameraBtnText');
+const fileInput = document.getElementById('fileInput');
+const cameraView = document.getElementById('cameraView');
+const video = document.getElementById('video');
+const captureBtn = document.getElementById('captureBtn');
+const imagePreview = document.getElementById('imagePreview');
+const selectedImage = document.getElementById('selectedImage');
+const analyzing = document.getElementById('analyzing');
+const results = document.getElementById('results');
+const emotionResults = document.getElementById('emotionResults');
+
+// Event listeners
+uploadBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', handleImageUpload);
+cameraBtn.addEventListener('click', toggleCamera);
+captureBtn.addEventListener('click', captureImage);
+
+// Functions
+function scrollToDemo() {
+  document.getElementById('demo').scrollIntoView({ behavior: 'smooth' });
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImage.src = e.target.result;
+      imagePreview.classList.remove('hidden');
+      imagePreview.classList.add('flex');
+      analyzeEmotion(e.target.result); // send uploaded image
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+async function toggleCamera() {
+  if (stream) {
+    stopCamera();
+  } else {
+    await startCamera();
+  }
+}
+
+
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // 🔄 Clear previous output
+    emotionResults.innerHTML = '';
+    results.classList.add('hidden');
+    analyzing.classList.add('hidden');
+    imagePreview.classList.add('hidden');
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImage.src = e.target.result;
+      imagePreview.classList.remove('hidden');
+      imagePreview.classList.add('flex');
+      analyzeEmotion(e.target.result); // send uploaded image
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+async function startCamera() {
+  try {
+    // 🔄 Clear previous output
+    emotionResults.innerHTML = '';
+    results.classList.add('hidden');
+    analyzing.classList.add('hidden');
+    imagePreview.classList.add('hidden');
+
+    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+    cameraView.classList.remove('hidden');
+    cameraView.classList.add('flex');
+    cameraBtnText.textContent = 'Stop Camera';
+
+    // Update camera icon
+    const cameraIcon = cameraBtn.querySelector('i');
+    cameraIcon.setAttribute('data-lucide', 'camera-off');
+    lucide.createIcons();
+
+    // 🔄 Start analyzing frames every second
+    analysisInterval = setInterval(captureFrameAndAnalyze, 1000);
+  } catch (error) {
+    console.error('Error accessing camera:', error);
+    alert('Unable to access camera. Please check permissions.');
+  }
+}
+
+
+function stopCamera() {
+  if (stream) {
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    stream = null;
+  }
+
+  if (analysisInterval) {
+    clearInterval(analysisInterval);
+    analysisInterval = null;
+  }
+
+  cameraView.classList.add('hidden');
+  cameraView.classList.remove('flex');
+  cameraBtnText.textContent = 'Use Camera';
+
+  // Update camera icon
+  const cameraIcon = cameraBtn.querySelector('i');
+  cameraIcon.setAttribute('data-lucide', 'camera');
+  lucide.createIcons();
+}
+
+// 🔄 Capture one frame and send it to backend
+function captureFrameAndAnalyze() {
+  if (!video.videoWidth || !video.videoHeight) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+
+  const imageData = canvas.toDataURL('image/jpeg');
+  analyzeEmotion(imageData);
+}
+
+// Manual capture button (optional)
+function captureImage() {
+  captureFrameAndAnalyze();
+}
+
+// 🔎 Send image to backend for analysis
+async function analyzeEmotion(imageData) {
+  if (isAnalyzing) return; // avoid overlap
+  isAnalyzing = true;
+
+  analyzing.classList.remove('hidden');
+  results.classList.add('hidden');
+
+  try {
+    const response = await fetch('/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imageData })
+    });
+
+    const data = await response.json();
+    displayResults(data.emotions);
+  } catch (error) {
+    console.error("Error analyzing emotion:", error);
+  }
+
+  analyzing.classList.add('hidden');
+  isAnalyzing = false;
+}
+
+// 🎨 Display emotion results
+function displayResults(emotions) {
+  emotionResults.innerHTML = '';
+
+  const colors = {
+    Angry: '#ef4444',     // red
+    Disgust: '#16a34a',   // green
+    Fear: '#f97316',      // orange
+    Happy: '#22c55e',     // bright green
+    Sad: '#3b82f6',       // blue
+    Surprise: '#eab308',  // yellow
+    Neutral: '#6b7280'    // gray
+  };
+
+  emotions.forEach(result => {
+    const percent = (result.confidence * 100).toFixed(1);
+    const color = colors[result.emotion] || '#9333ea'; // fallback purple
+
+    const emotionDiv = document.createElement('div');
+    emotionDiv.className = 'space-y-2';
+
+    emotionDiv.innerHTML = `
+      <div class="flex justify-between items-center">
+        <span class="font-medium">${result.emotion}</span>
+        <span class="text-sm text-muted-foreground">${percent}%</span>
+      </div>
+      <div class="w-full bg-secondary rounded-full h-3 overflow-hidden">
+        <div
+          class="h-full rounded-full transition-all duration-500 ease-out"
+          style="width: ${percent}%; background: ${color};"
+        ></div>
+      </div>
+    `;
+
+    emotionResults.appendChild(emotionDiv);
+  });
+
+  results.classList.remove('hidden');
+}
+
+// Initialize icons on page load
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+});
+
+</script>
+</body>
+</html>
